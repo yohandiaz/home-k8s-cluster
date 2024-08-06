@@ -1,0 +1,5 @@
+apiVersion: v2
+name: to-do
+description: A Helm chart for a FastAPI to-do application
+version: 0.0.1
+appVersion: "0.0.1"

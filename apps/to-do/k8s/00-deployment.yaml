@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: to-do-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: to-do
+  template:
+    metadata:
+      labels:
+        app: to-do
+    spec:
+      containers:
+      - name: to-do
+        image: yohandiaz/to-do:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"

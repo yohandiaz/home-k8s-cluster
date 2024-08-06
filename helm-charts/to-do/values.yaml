@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: yohandiaz/to-do
+  tag: 0.0.1
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
+  nodePort: 30001
