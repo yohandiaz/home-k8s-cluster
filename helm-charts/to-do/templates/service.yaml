@@ -8,7 +8,6 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      nodePort: {{ .Values.service.nodePort }}
+      targetPort: 8000
   selector:
     {{- include "to-do.selectorLabels" . | nindent 4 }}

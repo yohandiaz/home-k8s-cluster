@@ -1,2 +1,3 @@
 charts/*.tgz
 *.tgz
+Chart.lock

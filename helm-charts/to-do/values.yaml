@@ -1,12 +1,35 @@
-replicaCount: 1
-
 image:
   repository: yohandiaz/to-do
-  tag: 0.0.2
+  tag: latest
   pullPolicy: IfNotPresent
 
 service:
-  type: NodePort
-  port: 8000
-  targetPort: 8000
-  nodePort: 30001
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  hosts:
+    - host: todo.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+ingress-nginx:
+  controller:
+    replicaCount: 1
+    service:
+      type: NodePort
+    image:
+      repository: k8s.gcr.io/ingress-nginx/controller
+      tag: "v1.11.1"
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
