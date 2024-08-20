@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "to-do.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     {{- include "to-do.labels" . | nindent 4 }}
 spec:

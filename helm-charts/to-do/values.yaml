@@ -1,13 +1,26 @@
+namespace: to-do
+
 image:
   repository: yohandiaz/to-do
   tag: latest
   pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 service:
   type: ClusterIP
   port: 80
 
 ingress:
+  namespaceOverride: "to-do"
   enabled: true
   annotations: {}
   hosts:
