@@ -1,0 +1,94 @@
+namespace: worklog
+
+api:
+  image:
+    repository: yohandiaz/worklog-api
+    tag: 0.0.1
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  port: 8000
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+postgres:
+  image:
+    repository: postgres
+    tag: 13.16-alpine
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+  port: 5432
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  host: postgres
+  user: worklog
+  db: worklog
+  password: AgCKVzFW4FXxIMRbqT989EAKMHX5s6mJL9PHt2yS9QxxoqP7P/5eCEdSKyMFCUfDFGV6nkfVVXDCwnrsU542EgVE1XLiDKIaDOMslex/K2ZxDQqkRGInsFVURG3ZpBBoGP50+WV6PftV6ZF4xPG5IXN8OXW6qKoWx3VpLzpqHBfLj0WGf3xkIUDOTDbnsj0Y+RiaTCIlW668jVVoZrzIPNylqI61U04IQTQOywWQnaDNM01c/Kzw9YoYiBGA9R0oCgeSuu0vARFWKzNTXNovB5SWEBL/dSmsegec8ee6DOXyyq4hhNXJXQXwb8OewbScX2AaA+vCcImNC5CdS2KawSLtkIj4phkIpnFO7TcBvlExHCDzpfdYv3T+0Rj/1RwmMh6VhsnNAf5o4pckAQ1uLrZpO+qTvTNRZ2HvNmY29stlRG6NOzcxcEQQuuRcJtxSOdlIbjAPA8luwZzpu3bMkChlnH6WM1i7RtKx3C5sMweAAb7qyxEicMoHoqCy09TcjV2sYRNnjPtyd6bu0eq/g8q/xUUedIewD2bslaooNlk+Bwyf8zzIYt2AedZMH0KyIiuJDQdBE5bo+RldzexNREUPuBA/k/olWmn3ZUTpSvm7hkRaSWMqP8GzYptatsgjrubOeVJAkX1n3Kam26k/COr1QASeOdKDL/wkOETF0TMzf1d5M0n6WAP3veRCXrKa9wHeeyxGliqcgj08xAk3R9NbIfgeCg==
+
+  storage: 5Gi
+
+frontend:
+  image:
+    repository: yohandiaz/worklog-frontend
+    tag: 0.0.1
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  port: 3000
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  service:
+    type: ClusterIP
+    port: 80
+
+  api:
+    url: http://worklog-api:8000
+
+ingress:
+  namespaceOverride: "worklog"
+  enabled: true
+  annotations: {}
+  hosts:
+    - host: worklog.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+ingress-nginx:
+  controller:
+    replicaCount: 1
+    service:
+      type: NodePort
+    image:
+      repository: k8s.gcr.io/ingress-nginx/controller
+      tag: "v1.11.1"
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
