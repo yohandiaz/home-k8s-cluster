@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "worklog.fullname" . }}-api
+  name: {{ include "worklog.name" . }}-api
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "worklog.labels" . | nindent 4 }}
@@ -15,6 +15,10 @@ spec:
       labels:
         {{- include "worklog.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command: ['sh', '-c', 'until nc -z -v -w30 {{ include "worklog.name" . }}-postgres 5432; do echo "Waiting for PostgreSQL"; sleep 5; done']
       containers:
         - name: api
           image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
@@ -23,9 +27,8 @@ spec:
             - containerPort: {{ .Values.api.port }}
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}
-          envfrom:
-            - configMapRef:
-                name: {{ include "worklog.fullname" . }}-api-config
-          secrets:
-            - secretRef:
-                name: {{ include "worklog.fullname" . }}-api-secret
+          envFrom:
+          - configMapRef:
+              name: {{ include "worklog.name" . }}-api-config
+          - secretRef:
+              name: {{ include "worklog.name" . }}-postgres-secret

@@ -34,12 +34,21 @@ postgres:
       cpu: 100m
       memory: 128Mi
   
-  host: postgres
+  host: worklog-postgres
   user: worklog
   db: worklog
-  password: AgCKVzFW4FXxIMRbqT989EAKMHX5s6mJL9PHt2yS9QxxoqP7P/5eCEdSKyMFCUfDFGV6nkfVVXDCwnrsU542EgVE1XLiDKIaDOMslex/K2ZxDQqkRGInsFVURG3ZpBBoGP50+WV6PftV6ZF4xPG5IXN8OXW6qKoWx3VpLzpqHBfLj0WGf3xkIUDOTDbnsj0Y+RiaTCIlW668jVVoZrzIPNylqI61U04IQTQOywWQnaDNM01c/Kzw9YoYiBGA9R0oCgeSuu0vARFWKzNTXNovB5SWEBL/dSmsegec8ee6DOXyyq4hhNXJXQXwb8OewbScX2AaA+vCcImNC5CdS2KawSLtkIj4phkIpnFO7TcBvlExHCDzpfdYv3T+0Rj/1RwmMh6VhsnNAf5o4pckAQ1uLrZpO+qTvTNRZ2HvNmY29stlRG6NOzcxcEQQuuRcJtxSOdlIbjAPA8luwZzpu3bMkChlnH6WM1i7RtKx3C5sMweAAb7qyxEicMoHoqCy09TcjV2sYRNnjPtyd6bu0eq/g8q/xUUedIewD2bslaooNlk+Bwyf8zzIYt2AedZMH0KyIiuJDQdBE5bo+RldzexNREUPuBA/k/olWmn3ZUTpSvm7hkRaSWMqP8GzYptatsgjrubOeVJAkX1n3Kam26k/COr1QASeOdKDL/wkOETF0TMzf1d5M0n6WAP3veRCXrKa9wHeeyxGliqcgj08xAk3R9NbIfgeCg==
-
-  storage: 5Gi
+  password: AgAAe6xN98/VDCl0xaRC9FFr69sNFImIcqEpjj+LK4BDGKBLTxwH9f+vUu+YRsN7wtziZbqHjH/Aq1n+gWu2afo0VFQh1QFNmzi+x2mFB106SKwWrQuhuCxWIr44WmZCm2f3nz9dMn4EI5EOq02buOMAslfwooH4QJtDlq0JGJZvgCr4VyeCLzVdp1dwfFI6zAKyv78ye14tR2//jB37FJ8KYk3JAHefzEVWcMKCqiXT6jRVGZ63eO+Px9cZgk/2jxIF1ccSpV2iLf7RFr5YM+eKK2DtQQTw02CKsFbtOUWDu9LAcbEF26mDbGlJ6MKJxQCwE26ibtHqpU4Kwh3Kdm4Hk+LC6NJTk1ef1aAMvDUksuUPh+4u1/hRF1oHoU9wr3f4l53A0ME4sCSjXMSKuPGOAHE7kTgzt0ybP2Jlf32u50BZidMTSntO310xRmHv/hLUzcbmNUznloDsvoCSU1qjvlCeVNQ1umMJ/ny2wlMk8I6InHbXWR3Aob7jwRGNldLxu7ak1p5J3dCFot4ktKf1jfSMEHDI83RXbVS2SJG6U/u9BS5AA7BIz3nl9/mKBdWpGjzEgsZhQB/T5kQhUY3rL2GVzJYYtV28IxXCPVbmmuxEszkd/fN+bIk9t9JSSnfBIwB3jH7AXB7dNGR+Rb1QLo9eo2WdhLEyz9nV63SdzQ9d8pcBWh8Vmbojppwk+e91uofNtJrYZOoUvE7whhTC+hUrFA==
+  
+  pv:
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    hostPath: /mnt/data
+    storageClassName: worklog-storage-class
+  
+  reclaimPolicy: Retain
+  volumeBindingMode: Immediate
+  provisioner: kubernetes.io/no-provisioner
 
 frontend:
   image:
@@ -53,14 +62,13 @@ frontend:
   resources:
     limits:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
     requests:
       cpu: 100m
-      memory: 128Mi
+      memory: 256Mi
   
   service:
     type: ClusterIP
-    port: 80
 
   api:
     url: http://worklog-api:8000
@@ -70,7 +78,11 @@ ingress:
   enabled: true
   annotations: {}
   hosts:
-    - host: worklog.local
+    # - host: worklog.yohanlab.dev
+    #   paths:
+    #     - path: /
+    #       pathType: ImplementationSpecific
+    - host: localhost
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -81,10 +93,9 @@ ingress-nginx:
     replicaCount: 1
     service:
       type: NodePort
-    image:
-      repository: k8s.gcr.io/ingress-nginx/controller
-      tag: "v1.11.1"
-      pullPolicy: IfNotPresent
+      nodePorts:
+        http: 30080   # Expose HTTP on NodePort 30080
+        https: 30443  # Optionally expose HTTPS on NodePort 30443
     resources:
       limits:
         cpu: 100m

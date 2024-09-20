@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "worklog.fullname" . }}-api
+  name: {{ include "worklog.name" . }}-frontend
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "worklog.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.api.replicaCount }}
+  replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
       {{- include "worklog.selectorLabels" . | nindent 6 }}
@@ -23,6 +23,6 @@ spec:
             - containerPort: {{ .Values.frontend.port }}
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
-          envfrom:
-            - configMapRef:
-                name: {{ include "worklog.fullname" . }}-frontend-config
+          envFrom:
+          - configMapRef:
+              name: {{ include "worklog.name" . }}-frontend-config

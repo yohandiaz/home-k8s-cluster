@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "worklog.fullname" . }}-postgres
+  name: {{ include "worklog.name" . }}-postgres
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "worklog.labels" . | nindent 4 }}
@@ -24,11 +24,10 @@ spec:
           resources:
             {{- toYaml .Values.postgres.resources | nindent 12 }}
           envFrom:
-            - configMapRef:
-                name: {{ include "worklog.fullname" . }}-postgres-config
-          secrets:
-            - secretRef:
-                name: {{ include "worklog.fullname" . }}-postgres-secret
+          - configMapRef:
+              name: {{ include "worklog.name" . }}-postgres-config
+          - secretRef:
+              name: {{ include "worklog.name" . }}-postgres-secret
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
@@ -39,5 +38,6 @@ spec:
         accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: {{ .Values.postgres.storage }}
+            storage: {{ .Values.postgres.pv.size }}
+        storageClassName: {{ .Values.postgres.pv.storageClassName }}
           

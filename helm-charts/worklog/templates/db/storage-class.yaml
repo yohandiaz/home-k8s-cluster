@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ include "worklog.name" . }}-storage-class
+  labels:
+    app.kubernetes.io/name: {{ include "worklog.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+provisioner: {{ .Values.postgres.provisioner}}
+volumeBindingMode: {{ .Values.postgres.volumeBindingMode}}
+reclaimPolicy: {{ .Values.postgres.reclaimPolicy }}
