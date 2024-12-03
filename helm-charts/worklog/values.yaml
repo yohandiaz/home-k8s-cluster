@@ -77,30 +77,5 @@ postgres:
 #     url: http://worklog-api:8000
 
 ingress:
-  enabled: true
-  className: nginx
-  namespaceOverride: worklog
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-  hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-
-ingress-nginx:
-  controller:
-    replicaCount: 1
-    service:
-      type: NodePort
-      nodePorts:
-        http: 30080
-        https: 30443 
-    resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
+  path: /
+  pathType: Prefix
