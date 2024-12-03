@@ -75,7 +75,3 @@ postgres:
 
 #   api:
 #     url: http://worklog-api:8000
-
-ingress:
-  path: /
-  pathType: Prefix
