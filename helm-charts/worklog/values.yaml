@@ -1,13 +1,16 @@
 namespace: worklog
 
-api:
+worklog:
   image:
-    repository: yohandiaz/worklog-api
-    tag: 0.0.1
+    repository: yohandiaz/worklog
+    tag: v0.0.1
     pullPolicy: IfNotPresent
   
   replicaCount: 1
-  port: 8000
+  
+  service:
+    type: ClusterIP
+    port: 8000
 
   resources:
     limits:
@@ -37,7 +40,7 @@ postgres:
   host: worklog-postgres
   user: worklog
   db: worklog
-  password: AgAAe6xN98/VDCl0xaRC9FFr69sNFImIcqEpjj+LK4BDGKBLTxwH9f+vUu+YRsN7wtziZbqHjH/Aq1n+gWu2afo0VFQh1QFNmzi+x2mFB106SKwWrQuhuCxWIr44WmZCm2f3nz9dMn4EI5EOq02buOMAslfwooH4QJtDlq0JGJZvgCr4VyeCLzVdp1dwfFI6zAKyv78ye14tR2//jB37FJ8KYk3JAHefzEVWcMKCqiXT6jRVGZ63eO+Px9cZgk/2jxIF1ccSpV2iLf7RFr5YM+eKK2DtQQTw02CKsFbtOUWDu9LAcbEF26mDbGlJ6MKJxQCwE26ibtHqpU4Kwh3Kdm4Hk+LC6NJTk1ef1aAMvDUksuUPh+4u1/hRF1oHoU9wr3f4l53A0ME4sCSjXMSKuPGOAHE7kTgzt0ybP2Jlf32u50BZidMTSntO310xRmHv/hLUzcbmNUznloDsvoCSU1qjvlCeVNQ1umMJ/ny2wlMk8I6InHbXWR3Aob7jwRGNldLxu7ak1p5J3dCFot4ktKf1jfSMEHDI83RXbVS2SJG6U/u9BS5AA7BIz3nl9/mKBdWpGjzEgsZhQB/T5kQhUY3rL2GVzJYYtV28IxXCPVbmmuxEszkd/fN+bIk9t9JSSnfBIwB3jH7AXB7dNGR+Rb1QLo9eo2WdhLEyz9nV63SdzQ9d8pcBWh8Vmbojppwk+e91uofNtJrYZOoUvE7whhTC+hUrFA==
+  password: AgB6xeKVn4vSFZwWIk824rg8QG+MRLbDZTpGun/jb3LXcEaRrTsyjvH0yRzBoPKRBMnpsa+ULtcklSdl0fu881rKZpT1zojeTUu9CYyeveWjeUK5UxwuU/3EAvOXc35CWAXFaG8AVA7xTYLmdbOAsziYEcAI0iRMIoZPvzaXBejgr8/Wtsl9c20mg89LO/WnEQMJVoiuIaUn3Zi08nn+BtI06gdJkngobFnKceThXrUXc2NWXPB7GuE6c8WL0GfpLt46wuxFxDF6duunl77afNxKEXFESWiqGoTqzwawMN+mtbv49XAzk/5eNgUyCl97kEXZN1hhUhWEjADCbaZ/3gDZ3zXZo9d9/oO+0wbCCpPuVsNklidgHNYZKisRAvVtV0RoZ1tRsNsHAGvi3ks1kunKonBXAJLYpGQ2SWLJ1/ZiJUgPGUiAZwEf8QWlhss6cx1rZ610lSRsF7bZKkE3zunT0JBbeOQZFcetsursXNS4HV0No/+CNRW5D1G6i94DiaSNpOYteYYuG8iZ8JB4HP+lGswwktW2+xA79dqiOqskJzfPks5OJOAtF26OfTC1v8GDSGS7NPFHnlwcOHwYKhwIrXaAaM2BcxOiB660xDK8jDqzxtzPgjU6e12J0s32LF1l2q4hqNNYytI0CtBe6kAcT1XiyJYxmVMfjq9Chq4etZg6ydy3zpNf80gLvMvWIZA1P+wk96diW7ifr16gLuZiHfjZYQ==
   
   pv:
     accessModes:
@@ -50,39 +53,37 @@ postgres:
   volumeBindingMode: Immediate
   provisioner: kubernetes.io/no-provisioner
 
-frontend:
-  image:
-    repository: yohandiaz/worklog-frontend
-    tag: 0.0.1
-    pullPolicy: IfNotPresent
+# frontend:
+#   image:
+#     repository: yohandiaz/worklog-frontend
+#     tag: 0.0.1
+#     pullPolicy: IfNotPresent
   
-  replicaCount: 1
-  port: 3000
+#   replicaCount: 1
+#   port: 3000
 
-  resources:
-    limits:
-      cpu: 100m
-      memory: 512Mi
-    requests:
-      cpu: 100m
-      memory: 256Mi
+#   resources:
+#     limits:
+#       cpu: 100m
+#       memory: 512Mi
+#     requests:
+#       cpu: 100m
+#       memory: 256Mi
   
-  service:
-    type: ClusterIP
+#   service:
+#     type: ClusterIP
 
-  api:
-    url: http://worklog-api:8000
+#   api:
+#     url: http://worklog-api:8000
 
 ingress:
-  namespaceOverride: "worklog"
   enabled: true
-  annotations: {}
+  className: ""
+  namespaceOverride: worklog
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
   hosts:
-    # - host: worklog.yohanlab.dev
-    #   paths:
-    #     - path: /
-    #       pathType: ImplementationSpecific
-    - host: localhost
+    - host: localhoshtt
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -94,8 +95,8 @@ ingress-nginx:
     service:
       type: NodePort
       nodePorts:
-        http: 30080   # Expose HTTP on NodePort 30080
-        https: 30443  # Optionally expose HTTPS on NodePort 30443
+        http: 30080
+        https: 30443 
     resources:
       limits:
         cpu: 100m
